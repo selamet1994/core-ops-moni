@@ -153,11 +153,23 @@ const EQUIPMENTS: { code: string; name: string; params: string[] }[] = [
 
 function DailyChecklistPage() {
   const [eq, setEq] = useState(EQUIPMENTS[0].code);
+  const [month, setMonth] = useState<string>("all");
   const qc = useQueryClient();
   const { user, isAdmin } = useAuth();
   const [open, setOpen] = useState(false);
 
   const config = EQUIPMENTS.find((e) => e.code === eq)!;
+
+  const monthOptions = (() => {
+    const opts: { value: string; label: string }[] = [];
+    const now = new Date();
+    for (let i = 0; i < 24; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const v = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      opts.push({ value: v, label: d.toLocaleDateString("id-ID", { month: "long", year: "numeric" }) });
+    }
+    return opts;
+  })();
 
   const { data = [], isLoading } = useQuery({
     queryKey: ["dc", eq],
