@@ -13,6 +13,9 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedK3lWasteMonitoringRouteImport } from './routes/_authenticated/k3l.waste-monitoring'
+import { Route as AuthenticatedGaVehicleMonitoringRouteImport } from './routes/_authenticated/ga.vehicle-monitoring'
+import { Route as AuthenticatedFmsPreventiveMaintenanceRouteImport } from './routes/_authenticated/fms.preventive-maintenance'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -33,16 +36,40 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedK3lWasteMonitoringRoute =
+  AuthenticatedK3lWasteMonitoringRouteImport.update({
+    id: '/k3l/waste-monitoring',
+    path: '/k3l/waste-monitoring',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedGaVehicleMonitoringRoute =
+  AuthenticatedGaVehicleMonitoringRouteImport.update({
+    id: '/ga/vehicle-monitoring',
+    path: '/ga/vehicle-monitoring',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFmsPreventiveMaintenanceRoute =
+  AuthenticatedFmsPreventiveMaintenanceRouteImport.update({
+    id: '/fms/preventive-maintenance',
+    path: '/fms/preventive-maintenance',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/fms/preventive-maintenance': typeof AuthenticatedFmsPreventiveMaintenanceRoute
+  '/ga/vehicle-monitoring': typeof AuthenticatedGaVehicleMonitoringRoute
+  '/k3l/waste-monitoring': typeof AuthenticatedK3lWasteMonitoringRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/fms/preventive-maintenance': typeof AuthenticatedFmsPreventiveMaintenanceRoute
+  '/ga/vehicle-monitoring': typeof AuthenticatedGaVehicleMonitoringRoute
+  '/k3l/waste-monitoring': typeof AuthenticatedK3lWasteMonitoringRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -50,18 +77,36 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/fms/preventive-maintenance': typeof AuthenticatedFmsPreventiveMaintenanceRoute
+  '/_authenticated/ga/vehicle-monitoring': typeof AuthenticatedGaVehicleMonitoringRoute
+  '/_authenticated/k3l/waste-monitoring': typeof AuthenticatedK3lWasteMonitoringRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/dashboard'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/fms/preventive-maintenance'
+    | '/ga/vehicle-monitoring'
+    | '/k3l/waste-monitoring'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/dashboard'
+  to:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/fms/preventive-maintenance'
+    | '/ga/vehicle-monitoring'
+    | '/k3l/waste-monitoring'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/dashboard'
+    | '/_authenticated/fms/preventive-maintenance'
+    | '/_authenticated/ga/vehicle-monitoring'
+    | '/_authenticated/k3l/waste-monitoring'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -100,15 +145,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/k3l/waste-monitoring': {
+      id: '/_authenticated/k3l/waste-monitoring'
+      path: '/k3l/waste-monitoring'
+      fullPath: '/k3l/waste-monitoring'
+      preLoaderRoute: typeof AuthenticatedK3lWasteMonitoringRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/ga/vehicle-monitoring': {
+      id: '/_authenticated/ga/vehicle-monitoring'
+      path: '/ga/vehicle-monitoring'
+      fullPath: '/ga/vehicle-monitoring'
+      preLoaderRoute: typeof AuthenticatedGaVehicleMonitoringRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/fms/preventive-maintenance': {
+      id: '/_authenticated/fms/preventive-maintenance'
+      path: '/fms/preventive-maintenance'
+      fullPath: '/fms/preventive-maintenance'
+      preLoaderRoute: typeof AuthenticatedFmsPreventiveMaintenanceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedFmsPreventiveMaintenanceRoute: typeof AuthenticatedFmsPreventiveMaintenanceRoute
+  AuthenticatedGaVehicleMonitoringRoute: typeof AuthenticatedGaVehicleMonitoringRoute
+  AuthenticatedK3lWasteMonitoringRoute: typeof AuthenticatedK3lWasteMonitoringRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedFmsPreventiveMaintenanceRoute:
+    AuthenticatedFmsPreventiveMaintenanceRoute,
+  AuthenticatedGaVehicleMonitoringRoute: AuthenticatedGaVehicleMonitoringRoute,
+  AuthenticatedK3lWasteMonitoringRoute: AuthenticatedK3lWasteMonitoringRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
