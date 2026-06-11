@@ -15,7 +15,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedK3lWasteMonitoringRouteImport } from './routes/_authenticated/k3l.waste-monitoring'
 import { Route as AuthenticatedGaVehicleMonitoringRouteImport } from './routes/_authenticated/ga.vehicle-monitoring'
+import { Route as AuthenticatedFmsUtilityTestsRouteImport } from './routes/_authenticated/fms.utility-tests'
+import { Route as AuthenticatedFmsSparePartsRouteImport } from './routes/_authenticated/fms.spare-parts'
 import { Route as AuthenticatedFmsPreventiveMaintenanceRouteImport } from './routes/_authenticated/fms.preventive-maintenance'
+import { Route as AuthenticatedFmsEquipmentHistoryRouteImport } from './routes/_authenticated/fms.equipment-history'
+import { Route as AuthenticatedFmsDailyChecklistRouteImport } from './routes/_authenticated/fms.daily-checklist'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -48,10 +52,34 @@ const AuthenticatedGaVehicleMonitoringRoute =
     path: '/ga/vehicle-monitoring',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedFmsUtilityTestsRoute =
+  AuthenticatedFmsUtilityTestsRouteImport.update({
+    id: '/fms/utility-tests',
+    path: '/fms/utility-tests',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFmsSparePartsRoute =
+  AuthenticatedFmsSparePartsRouteImport.update({
+    id: '/fms/spare-parts',
+    path: '/fms/spare-parts',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedFmsPreventiveMaintenanceRoute =
   AuthenticatedFmsPreventiveMaintenanceRouteImport.update({
     id: '/fms/preventive-maintenance',
     path: '/fms/preventive-maintenance',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFmsEquipmentHistoryRoute =
+  AuthenticatedFmsEquipmentHistoryRouteImport.update({
+    id: '/fms/equipment-history',
+    path: '/fms/equipment-history',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFmsDailyChecklistRoute =
+  AuthenticatedFmsDailyChecklistRouteImport.update({
+    id: '/fms/daily-checklist',
+    path: '/fms/daily-checklist',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 
@@ -59,7 +87,11 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/fms/daily-checklist': typeof AuthenticatedFmsDailyChecklistRoute
+  '/fms/equipment-history': typeof AuthenticatedFmsEquipmentHistoryRoute
   '/fms/preventive-maintenance': typeof AuthenticatedFmsPreventiveMaintenanceRoute
+  '/fms/spare-parts': typeof AuthenticatedFmsSparePartsRoute
+  '/fms/utility-tests': typeof AuthenticatedFmsUtilityTestsRoute
   '/ga/vehicle-monitoring': typeof AuthenticatedGaVehicleMonitoringRoute
   '/k3l/waste-monitoring': typeof AuthenticatedK3lWasteMonitoringRoute
 }
@@ -67,7 +99,11 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/fms/daily-checklist': typeof AuthenticatedFmsDailyChecklistRoute
+  '/fms/equipment-history': typeof AuthenticatedFmsEquipmentHistoryRoute
   '/fms/preventive-maintenance': typeof AuthenticatedFmsPreventiveMaintenanceRoute
+  '/fms/spare-parts': typeof AuthenticatedFmsSparePartsRoute
+  '/fms/utility-tests': typeof AuthenticatedFmsUtilityTestsRoute
   '/ga/vehicle-monitoring': typeof AuthenticatedGaVehicleMonitoringRoute
   '/k3l/waste-monitoring': typeof AuthenticatedK3lWasteMonitoringRoute
 }
@@ -77,7 +113,11 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/fms/daily-checklist': typeof AuthenticatedFmsDailyChecklistRoute
+  '/_authenticated/fms/equipment-history': typeof AuthenticatedFmsEquipmentHistoryRoute
   '/_authenticated/fms/preventive-maintenance': typeof AuthenticatedFmsPreventiveMaintenanceRoute
+  '/_authenticated/fms/spare-parts': typeof AuthenticatedFmsSparePartsRoute
+  '/_authenticated/fms/utility-tests': typeof AuthenticatedFmsUtilityTestsRoute
   '/_authenticated/ga/vehicle-monitoring': typeof AuthenticatedGaVehicleMonitoringRoute
   '/_authenticated/k3l/waste-monitoring': typeof AuthenticatedK3lWasteMonitoringRoute
 }
@@ -87,7 +127,11 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/fms/daily-checklist'
+    | '/fms/equipment-history'
     | '/fms/preventive-maintenance'
+    | '/fms/spare-parts'
+    | '/fms/utility-tests'
     | '/ga/vehicle-monitoring'
     | '/k3l/waste-monitoring'
   fileRoutesByTo: FileRoutesByTo
@@ -95,7 +139,11 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/fms/daily-checklist'
+    | '/fms/equipment-history'
     | '/fms/preventive-maintenance'
+    | '/fms/spare-parts'
+    | '/fms/utility-tests'
     | '/ga/vehicle-monitoring'
     | '/k3l/waste-monitoring'
   id:
@@ -104,7 +152,11 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/dashboard'
+    | '/_authenticated/fms/daily-checklist'
+    | '/_authenticated/fms/equipment-history'
     | '/_authenticated/fms/preventive-maintenance'
+    | '/_authenticated/fms/spare-parts'
+    | '/_authenticated/fms/utility-tests'
     | '/_authenticated/ga/vehicle-monitoring'
     | '/_authenticated/k3l/waste-monitoring'
   fileRoutesById: FileRoutesById
@@ -159,6 +211,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedGaVehicleMonitoringRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/fms/utility-tests': {
+      id: '/_authenticated/fms/utility-tests'
+      path: '/fms/utility-tests'
+      fullPath: '/fms/utility-tests'
+      preLoaderRoute: typeof AuthenticatedFmsUtilityTestsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/fms/spare-parts': {
+      id: '/_authenticated/fms/spare-parts'
+      path: '/fms/spare-parts'
+      fullPath: '/fms/spare-parts'
+      preLoaderRoute: typeof AuthenticatedFmsSparePartsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/fms/preventive-maintenance': {
       id: '/_authenticated/fms/preventive-maintenance'
       path: '/fms/preventive-maintenance'
@@ -166,20 +232,42 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFmsPreventiveMaintenanceRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/fms/equipment-history': {
+      id: '/_authenticated/fms/equipment-history'
+      path: '/fms/equipment-history'
+      fullPath: '/fms/equipment-history'
+      preLoaderRoute: typeof AuthenticatedFmsEquipmentHistoryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/fms/daily-checklist': {
+      id: '/_authenticated/fms/daily-checklist'
+      path: '/fms/daily-checklist'
+      fullPath: '/fms/daily-checklist'
+      preLoaderRoute: typeof AuthenticatedFmsDailyChecklistRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedFmsDailyChecklistRoute: typeof AuthenticatedFmsDailyChecklistRoute
+  AuthenticatedFmsEquipmentHistoryRoute: typeof AuthenticatedFmsEquipmentHistoryRoute
   AuthenticatedFmsPreventiveMaintenanceRoute: typeof AuthenticatedFmsPreventiveMaintenanceRoute
+  AuthenticatedFmsSparePartsRoute: typeof AuthenticatedFmsSparePartsRoute
+  AuthenticatedFmsUtilityTestsRoute: typeof AuthenticatedFmsUtilityTestsRoute
   AuthenticatedGaVehicleMonitoringRoute: typeof AuthenticatedGaVehicleMonitoringRoute
   AuthenticatedK3lWasteMonitoringRoute: typeof AuthenticatedK3lWasteMonitoringRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedFmsDailyChecklistRoute: AuthenticatedFmsDailyChecklistRoute,
+  AuthenticatedFmsEquipmentHistoryRoute: AuthenticatedFmsEquipmentHistoryRoute,
   AuthenticatedFmsPreventiveMaintenanceRoute:
     AuthenticatedFmsPreventiveMaintenanceRoute,
+  AuthenticatedFmsSparePartsRoute: AuthenticatedFmsSparePartsRoute,
+  AuthenticatedFmsUtilityTestsRoute: AuthenticatedFmsUtilityTestsRoute,
   AuthenticatedGaVehicleMonitoringRoute: AuthenticatedGaVehicleMonitoringRoute,
   AuthenticatedK3lWasteMonitoringRoute: AuthenticatedK3lWasteMonitoringRoute,
 }
