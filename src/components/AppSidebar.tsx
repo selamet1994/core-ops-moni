@@ -7,6 +7,10 @@ import {
   Building2,
   ShieldCheck,
   HardHat,
+  Boxes,
+  Gauge,
+  History,
+  ClipboardCheck,
 } from "lucide-react";
 import {
   Sidebar,
@@ -31,6 +35,10 @@ const groups = [
     icon: Building2,
     items: [
       { title: "Preventive Maintenance", url: "/fms/preventive-maintenance", icon: Wrench },
+      { title: "Logistik Teknik", url: "/fms/spare-parts", icon: Boxes },
+      { title: "Uji Fungsi Utilitas", url: "/fms/utility-tests", icon: Gauge },
+      { title: "Data History Peralatan", url: "/fms/equipment-history", icon: History },
+      { title: "Daily Checklist MHKN", url: "/fms/daily-checklist", icon: ClipboardCheck },
     ],
   },
   {
