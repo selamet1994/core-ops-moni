@@ -13,7 +13,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { PageHeader } from "@/components/PageHeader";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
-import { Plus, Trash2, Loader2 } from "lucide-react";
+import { Plus, Trash2, Loader2, Download } from "lucide-react";
+import * as XLSX from "xlsx";
 
 export const Route = createFileRoute("/_authenticated/fms/daily-checklist")({
   head: () => ({ meta: [{ title: "Daily Checklist MHKN — FMS" }] }),
@@ -152,11 +153,23 @@ const EQUIPMENTS: { code: string; name: string; params: string[] }[] = [
 
 function DailyChecklistPage() {
   const [eq, setEq] = useState(EQUIPMENTS[0].code);
+  const [month, setMonth] = useState<string>("all");
   const qc = useQueryClient();
   const { user, isAdmin } = useAuth();
   const [open, setOpen] = useState(false);
 
   const config = EQUIPMENTS.find((e) => e.code === eq)!;
+
+  const monthOptions = (() => {
+    const opts: { value: string; label: string }[] = [];
+    const now = new Date();
+    for (let i = 0; i < 24; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const v = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      opts.push({ value: v, label: d.toLocaleDateString("id-ID", { month: "long", year: "numeric" }) });
+    }
+    return opts;
+  })();
 
   const { data = [], isLoading } = useQuery({
     queryKey: ["dc", eq],
@@ -182,6 +195,33 @@ function DailyChecklistPage() {
     onError: (e: any) => toast.error(e.message),
   });
 
+  const handleDownload = () => {
+    let rows = data;
+    if (month !== "all") {
+      const [y, m] = month.split("-").map(Number);
+      rows = rows.filter((r: any) => {
+        const d = new Date(r.checked_at);
+        return d.getFullYear() === y && d.getMonth() + 1 === m;
+      });
+    }
+    if (rows.length === 0) { toast.error("Tidak ada data untuk diunduh"); return; }
+    const sheetData = rows.map((r: any) => {
+      const base: Record<string, any> = {
+        Waktu: new Date(r.checked_at).toLocaleString("id-ID"),
+        Shift: r.shift ?? "",
+        PIC: r.pic ?? "",
+      };
+      config.params.forEach((p) => { base[p] = r.data?.[p] ?? ""; });
+      base.Remarks = r.remarks ?? "";
+      return base;
+    });
+    const ws = XLSX.utils.json_to_sheet(sheetData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, config.code.slice(0, 30));
+    const label = month === "all" ? "all-bulan" : month;
+    XLSX.writeFile(wb, `daily-checklist_${config.code}_${label}.xlsx`);
+  };
+
   return (
     <>
       <PageHeader title="Daily Checklist MHKN" description="Checklist harian peralatan utilitas gedung.">
@@ -191,11 +231,20 @@ function DailyChecklistPage() {
             {EQUIPMENTS.map((e) => <SelectItem key={e.code} value={e.code}>{e.name}</SelectItem>)}
           </SelectContent>
         </Select>
+        <Select value={month} onValueChange={setMonth}>
+          <SelectTrigger className="w-48"><SelectValue placeholder="Pilih bulan" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Semua Bulan</SelectItem>
+            {monthOptions.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Button variant="outline" onClick={handleDownload}><Download className="mr-2 h-4 w-4" />Excel</Button>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild><Button><Plus className="mr-2 h-4 w-4" />Tambah Checklist</Button></DialogTrigger>
           <ChecklistDialog config={config} onSubmit={(f) => createMut.mutate(f)} pending={createMut.isPending} />
         </Dialog>
       </PageHeader>
+
 
       <Card>
         <CardContent className="p-0">
