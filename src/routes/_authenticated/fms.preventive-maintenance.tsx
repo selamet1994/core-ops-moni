@@ -2,19 +2,23 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useMemo } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { PageHeader } from "@/components/PageHeader";
 import { StatusBadge } from "@/components/StatusBadge";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
-import { Plus, Search, Trash2, Loader2 } from "lucide-react";
+import { Plus, Search, Trash2, Loader2, ClipboardList, CheckCircle2 } from "lucide-react";
+import { PM_CATALOG, MONTHS_ID, type PMCategory } from "@/lib/pm-catalog";
 
 export const Route = createFileRoute("/_authenticated/fms/preventive-maintenance")({
   head: () => ({ meta: [{ title: "Preventive Maintenance — FMS" }] }),
@@ -85,71 +89,181 @@ function PMPage() {
 
   return (
     <>
-      <PageHeader title="Preventive Maintenance" description="Penjadwalan & monitoring pekerjaan PM aset gedung.">
-        <div className="relative">
-          <Search className="pointer-events-none absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Cari aset / tiket…" className="w-64 pl-8" value={search} onChange={(e) => setSearch(e.target.value)} />
-        </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button><Plus className="mr-2 h-4 w-4" /> Tambah PM</Button>
-          </DialogTrigger>
-          <CreatePMDialog onSubmit={(f) => createMut.mutate(f)} pending={createMut.isPending} />
-        </Dialog>
-      </PageHeader>
+      <PageHeader title="Preventive Maintenance" description="Penjadwalan & monitoring pekerjaan PM aset gedung." />
 
-      <Card>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Tiket</TableHead>
-                <TableHead>Aset</TableHead>
-                <TableHead>Lokasi</TableHead>
-                <TableHead>Jadwal</TableHead>
-                <TableHead>Prioritas</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="w-32 text-right">Aksi</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading && (
-                <TableRow><TableCell colSpan={7} className="py-10 text-center text-muted-foreground"><Loader2 className="mx-auto h-5 w-5 animate-spin" /></TableCell></TableRow>
-              )}
-              {!isLoading && filtered.length === 0 && (
-                <TableRow><TableCell colSpan={7} className="py-10 text-center text-muted-foreground">Belum ada data.</TableCell></TableRow>
-              )}
-              {filtered.map((r) => (
-                <TableRow key={r.id}>
-                  <TableCell className="font-mono text-xs">{r.ticket_no}</TableCell>
-                  <TableCell className="font-medium">{r.asset_name}</TableCell>
-                  <TableCell>{r.location ?? "—"}</TableCell>
-                  <TableCell>{r.scheduled_date}</TableCell>
-                  <TableCell className="capitalize">{r.priority}</TableCell>
-                  <TableCell>
-                    <Select value={r.status} onValueChange={(v) => updateStatus.mutate({ id: r.id, status: v })}>
-                      <SelectTrigger className="h-8 w-36 text-xs"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {["pending","in_progress","completed","overdue","approved","rejected"].map(s =>
-                          <SelectItem key={s} value={s}><StatusBadge status={s} /></SelectItem>
+      <Tabs defaultValue="tickets" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="tickets"><CheckCircle2 className="mr-1.5 h-4 w-4" /> Jadwal & Tiket PM</TabsTrigger>
+          <TabsTrigger value="catalog"><ClipboardList className="mr-1.5 h-4 w-4" /> Daftar PM Bulanan</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="tickets" className="space-y-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input placeholder="Cari aset / tiket…" className="w-64 pl-8" value={search} onChange={(e) => setSearch(e.target.value)} />
+            </div>
+            <div className="ml-auto">
+              <Dialog open={open} onOpenChange={setOpen}>
+                <DialogTrigger asChild>
+                  <Button><Plus className="mr-2 h-4 w-4" /> Tambah PM</Button>
+                </DialogTrigger>
+                <CreatePMDialog onSubmit={(f) => createMut.mutate(f)} pending={createMut.isPending} />
+              </Dialog>
+            </div>
+          </div>
+
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Tiket</TableHead>
+                    <TableHead>Aset</TableHead>
+                    <TableHead>Lokasi</TableHead>
+                    <TableHead>Jadwal</TableHead>
+                    <TableHead>Prioritas</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="w-32 text-right">Aksi</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {isLoading && (
+                    <TableRow><TableCell colSpan={7} className="py-10 text-center text-muted-foreground"><Loader2 className="mx-auto h-5 w-5 animate-spin" /></TableCell></TableRow>
+                  )}
+                  {!isLoading && filtered.length === 0 && (
+                    <TableRow><TableCell colSpan={7} className="py-10 text-center text-muted-foreground">Belum ada data.</TableCell></TableRow>
+                  )}
+                  {filtered.map((r) => (
+                    <TableRow key={r.id}>
+                      <TableCell className="font-mono text-xs">{r.ticket_no}</TableCell>
+                      <TableCell className="font-medium">{r.asset_name}</TableCell>
+                      <TableCell>{r.location ?? "—"}</TableCell>
+                      <TableCell>{r.scheduled_date}</TableCell>
+                      <TableCell className="capitalize">{r.priority}</TableCell>
+                      <TableCell>
+                        <Select value={r.status} onValueChange={(v) => updateStatus.mutate({ id: r.id, status: v })}>
+                          <SelectTrigger className="h-8 w-36 text-xs"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            {["pending","in_progress","completed","overdue","approved","rejected"].map(s =>
+                              <SelectItem key={s} value={s}><StatusBadge status={s} /></SelectItem>
+                            )}
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {isAdmin && (
+                          <Button variant="ghost" size="icon" onClick={() => { if (confirm("Hapus data ini?")) delMut.mutate(r.id); }}>
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
                         )}
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {isAdmin && (
-                      <Button variant="ghost" size="icon" onClick={() => { if (confirm("Hapus data ini?")) delMut.mutate(r.id); }}>
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="catalog">
+          <PMCatalogView onSchedule={(cat) => {
+            const today = new Date().toISOString().slice(0, 10);
+            createMut.mutate({
+              asset_name: cat.name,
+              location: "",
+              description: `PM Bulanan ${cat.name} — ${cat.checklist.length} item pemeriksaan`,
+              scheduled_date: today,
+              priority: "medium",
+              notes: cat.checklist.map((c, i) => `${i + 1}. ${c}`).join("\n"),
+            });
+          }} />
+        </TabsContent>
+      </Tabs>
+    </>
+  );
+}
+
+function PMCatalogView({ onSchedule }: { onSchedule: (cat: PMCategory) => void }) {
+  const [group, setGroup] = useState<string>("ALL");
+  const [month, setMonth] = useState<string>(MONTHS_ID[new Date().getMonth()]);
+  const items = useMemo(
+    () => group === "ALL" ? PM_CATALOG : PM_CATALOG.filter((c) => c.group === group),
+    [group],
+  );
+
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Daftar PM yang harus dilakukan tiap bulan</CardTitle>
+          <CardDescription>
+            Referensi master MHKN — pilih bulan & kelompok, lalu generate tiket PM untuk kategori yang dikerjakan.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-wrap items-end gap-3">
+          <div className="space-y-1">
+            <Label className="text-xs">Bulan</Label>
+            <Select value={month} onValueChange={setMonth}>
+              <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+              <SelectContent>{MONTHS_ID.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Kelompok</Label>
+            <Select value={group} onValueChange={setGroup}>
+              <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">Semua</SelectItem>
+                <SelectItem value="MEP">MEP</SelectItem>
+                <SelectItem value="HVAC">HVAC</SelectItem>
+                <SelectItem value="PANEL">Panel</SelectItem>
+                <SelectItem value="LIFT">Lift</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="ml-auto text-sm text-muted-foreground">
+            Total: <span className="font-semibold text-foreground">{items.length}</span> kategori
+          </div>
         </CardContent>
       </Card>
-    </>
+
+      <Card>
+        <CardContent className="p-2 sm:p-4">
+          <Accordion type="multiple" className="w-full">
+            {items.map((cat) => (
+              <AccordionItem key={cat.code} value={cat.code}>
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex flex-1 items-center gap-3 pr-2">
+                    <Badge variant="outline" className="font-mono text-[10px]">{cat.group}</Badge>
+                    <span className="font-medium">{cat.name}</span>
+                    <Badge variant="secondary" className="text-[10px]">{cat.checklist.length} item</Badge>
+                    <span className="ml-auto text-xs text-muted-foreground">{cat.period}</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="space-y-3">
+                    <ol className="grid grid-cols-1 gap-x-6 gap-y-1.5 pl-1 text-sm sm:grid-cols-2 lg:grid-cols-3">
+                      {cat.checklist.map((item, i) => (
+                        <li key={i} className="flex gap-2">
+                          <span className="text-muted-foreground tabular-nums">{String(i + 1).padStart(2, "0")}.</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ol>
+                    <div className="flex justify-end pt-2">
+                      <Button size="sm" variant="outline" onClick={() => onSchedule(cat)}>
+                        <Plus className="mr-1.5 h-3.5 w-3.5" /> Jadwalkan PM {month}
+                      </Button>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 
