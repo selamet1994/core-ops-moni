@@ -63,7 +63,7 @@ function PMPage() {
   });
 
   const updateStatus = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+    mutationFn: async ({ id, status }: { id: string; status: any }) => {
       const { error } = await supabase
         .from("preventive_maintenance")
         .update({ status, completed_date: status === "completed" ? new Date().toISOString().slice(0,10) : null })
