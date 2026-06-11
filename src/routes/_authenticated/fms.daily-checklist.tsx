@@ -13,7 +13,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { PageHeader } from "@/components/PageHeader";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
-import { Plus, Trash2, Loader2 } from "lucide-react";
+import { Plus, Trash2, Loader2, Download } from "lucide-react";
+import * as XLSX from "xlsx";
 
 export const Route = createFileRoute("/_authenticated/fms/daily-checklist")({
   head: () => ({ meta: [{ title: "Daily Checklist MHKN — FMS" }] }),
