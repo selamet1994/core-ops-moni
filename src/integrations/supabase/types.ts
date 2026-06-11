@@ -14,6 +14,111 @@ export type Database = {
   }
   public: {
     Tables: {
+      daily_checklists: {
+        Row: {
+          checked_at: string
+          created_at: string
+          created_by: string | null
+          data: Json
+          equipment_code: string
+          equipment_name: string
+          id: string
+          pic: string | null
+          remarks: string | null
+          shift: string | null
+          updated_at: string
+        }
+        Insert: {
+          checked_at?: string
+          created_at?: string
+          created_by?: string | null
+          data?: Json
+          equipment_code: string
+          equipment_name: string
+          id?: string
+          pic?: string | null
+          remarks?: string | null
+          shift?: string | null
+          updated_at?: string
+        }
+        Update: {
+          checked_at?: string
+          created_at?: string
+          created_by?: string | null
+          data?: Json
+          equipment_code?: string
+          equipment_name?: string
+          id?: string
+          pic?: string | null
+          remarks?: string | null
+          shift?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      equipment_history: {
+        Row: {
+          asset_code: string | null
+          asset_name: string
+          brand_type: string | null
+          capacity: string | null
+          category: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          documentation_url: string | null
+          id: string
+          location: string | null
+          pic: string | null
+          po_url: string | null
+          serial_number: string | null
+          status: string | null
+          updated_at: string
+          work_date: string
+          year_acquired: number | null
+        }
+        Insert: {
+          asset_code?: string | null
+          asset_name: string
+          brand_type?: string | null
+          capacity?: string | null
+          category: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          documentation_url?: string | null
+          id?: string
+          location?: string | null
+          pic?: string | null
+          po_url?: string | null
+          serial_number?: string | null
+          status?: string | null
+          updated_at?: string
+          work_date?: string
+          year_acquired?: number | null
+        }
+        Update: {
+          asset_code?: string | null
+          asset_name?: string
+          brand_type?: string | null
+          capacity?: string | null
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          documentation_url?: string | null
+          id?: string
+          location?: string | null
+          pic?: string | null
+          po_url?: string | null
+          serial_number?: string | null
+          status?: string | null
+          updated_at?: string
+          work_date?: string
+          year_acquired?: number | null
+        }
+        Relationships: []
+      }
       preventive_maintenance: {
         Row: {
           asset_name: string
@@ -92,6 +197,105 @@ export type Database = {
         }
         Relationships: []
       }
+      spare_part_movements: {
+        Row: {
+          arrival_date: string | null
+          brand_type: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          movement_type: string
+          notes: string | null
+          occurred_at: string
+          part_code: string | null
+          part_name: string
+          pic: string | null
+          quantity: number
+          request_date: string | null
+          unit: string | null
+          updated_at: string
+        }
+        Insert: {
+          arrival_date?: string | null
+          brand_type?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          movement_type: string
+          notes?: string | null
+          occurred_at?: string
+          part_code?: string | null
+          part_name: string
+          pic?: string | null
+          quantity?: number
+          request_date?: string | null
+          unit?: string | null
+          updated_at?: string
+        }
+        Update: {
+          arrival_date?: string | null
+          brand_type?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          movement_type?: string
+          notes?: string | null
+          occurred_at?: string
+          part_code?: string | null
+          part_name?: string
+          pic?: string | null
+          quantity?: number
+          request_date?: string | null
+          unit?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      spare_parts: {
+        Row: {
+          barcode: string | null
+          code: string
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          stock_final: number | null
+          stock_in: number
+          stock_initial: number
+          stock_out: number
+          unit: string | null
+          updated_at: string
+        }
+        Insert: {
+          barcode?: string | null
+          code: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          stock_final?: number | null
+          stock_in?: number
+          stock_initial?: number
+          stock_out?: number
+          unit?: string | null
+          updated_at?: string
+        }
+        Update: {
+          barcode?: string | null
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          stock_final?: number | null
+          stock_in?: number
+          stock_initial?: number
+          stock_out?: number
+          unit?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -110,6 +314,48 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      utility_tests: {
+        Row: {
+          asset_name: string | null
+          created_at: string
+          created_by: string | null
+          data: Json
+          id: string
+          location: string | null
+          notes: string | null
+          technician: string | null
+          test_date: string
+          test_type: string
+          updated_at: string
+        }
+        Insert: {
+          asset_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          data?: Json
+          id?: string
+          location?: string | null
+          notes?: string | null
+          technician?: string | null
+          test_date?: string
+          test_type: string
+          updated_at?: string
+        }
+        Update: {
+          asset_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          data?: Json
+          id?: string
+          location?: string | null
+          notes?: string | null
+          technician?: string | null
+          test_date?: string
+          test_type?: string
+          updated_at?: string
         }
         Relationships: []
       }
