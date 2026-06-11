@@ -14,16 +14,219 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      preventive_maintenance: {
+        Row: {
+          asset_name: string
+          assigned_to: string | null
+          completed_date: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          location: string | null
+          notes: string | null
+          priority: string
+          scheduled_date: string
+          status: Database["public"]["Enums"]["work_status"]
+          ticket_no: string
+          updated_at: string
+        }
+        Insert: {
+          asset_name: string
+          assigned_to?: string | null
+          completed_date?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          priority?: string
+          scheduled_date: string
+          status?: Database["public"]["Enums"]["work_status"]
+          ticket_no?: string
+          updated_at?: string
+        }
+        Update: {
+          asset_name?: string
+          assigned_to?: string | null
+          completed_date?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          priority?: string
+          scheduled_date?: string
+          status?: Database["public"]["Enums"]["work_status"]
+          ticket_no?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          division: Database["public"]["Enums"]["division"] | null
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          division?: Database["public"]["Enums"]["division"] | null
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          division?: Database["public"]["Enums"]["division"] | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      vehicle_monitoring: {
+        Row: {
+          check_date: string
+          condition: string | null
+          created_at: string
+          created_by: string
+          driver_name: string | null
+          fuel_level: number | null
+          id: string
+          mileage: number | null
+          notes: string | null
+          status: Database["public"]["Enums"]["work_status"]
+          updated_at: string
+          vehicle_plate: string
+        }
+        Insert: {
+          check_date: string
+          condition?: string | null
+          created_at?: string
+          created_by: string
+          driver_name?: string | null
+          fuel_level?: number | null
+          id?: string
+          mileage?: number | null
+          notes?: string | null
+          status?: Database["public"]["Enums"]["work_status"]
+          updated_at?: string
+          vehicle_plate: string
+        }
+        Update: {
+          check_date?: string
+          condition?: string | null
+          created_at?: string
+          created_by?: string
+          driver_name?: string | null
+          fuel_level?: number | null
+          id?: string
+          mileage?: number | null
+          notes?: string | null
+          status?: Database["public"]["Enums"]["work_status"]
+          updated_at?: string
+          vehicle_plate?: string
+        }
+        Relationships: []
+      }
+      waste_monitoring: {
+        Row: {
+          category: string
+          created_at: string
+          created_by: string
+          disposal_method: string | null
+          id: string
+          log_date: string
+          notes: string | null
+          source_location: string | null
+          status: Database["public"]["Enums"]["work_status"]
+          updated_at: string
+          waste_type: string
+          weight_kg: number
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          created_by: string
+          disposal_method?: string | null
+          id?: string
+          log_date: string
+          notes?: string | null
+          source_location?: string | null
+          status?: Database["public"]["Enums"]["work_status"]
+          updated_at?: string
+          waste_type: string
+          weight_kg?: number
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          created_by?: string
+          disposal_method?: string | null
+          id?: string
+          log_date?: string
+          notes?: string | null
+          source_location?: string | null
+          status?: Database["public"]["Enums"]["work_status"]
+          updated_at?: string
+          waste_type?: string
+          weight_kg?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "super_admin" | "admin" | "member"
+      division: "fms" | "ga" | "k3l"
+      work_status:
+        | "pending"
+        | "in_progress"
+        | "completed"
+        | "overdue"
+        | "approved"
+        | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +353,17 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["super_admin", "admin", "member"],
+      division: ["fms", "ga", "k3l"],
+      work_status: [
+        "pending",
+        "in_progress",
+        "completed",
+        "overdue",
+        "approved",
+        "rejected",
+      ],
+    },
   },
 } as const
