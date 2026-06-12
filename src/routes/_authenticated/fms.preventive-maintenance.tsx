@@ -104,8 +104,11 @@ function PMPage() {
           <div className="flex flex-wrap items-center gap-2">
             <div className="relative">
               <Search className="pointer-events-none absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input placeholder="Cari aset / tiket…" className="w-64 pl-8" value={search} onChange={(e) => setSearch(e.target.value)} />
+              <Input placeholder="Cari aset / tiket / kode QR…" className="w-72 pl-8" value={search} onChange={(e) => setSearch(e.target.value)} />
             </div>
+            <Button variant="outline" onClick={() => setScannerOpen(true)}>
+              <ScanLine className="mr-2 h-4 w-4" /> Scan QR
+            </Button>
             <div className="ml-auto">
               <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
