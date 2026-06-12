@@ -290,17 +290,20 @@ function PMCatalogView({
             </Select>
           </div>
           <div className="space-y-1 flex-1 min-w-[200px]">
-            <Label className="text-xs">Cari alat / lokasi</Label>
+            <Label className="text-xs">Cari alat / lokasi / kode QR</Label>
             <div className="relative">
               <Search className="pointer-events-none absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 className="pl-8"
-                placeholder="Mis. Chiller, AHU, PP HVAC, LANTAI 3…"
+                placeholder="Mis. Chiller, AHU, PP HVAC, LANTAI 3, MEP-MHKN-001…"
                 value={scheduleSearch}
                 onChange={(e) => setScheduleSearch(e.target.value)}
               />
             </div>
           </div>
+          <Button variant="outline" onClick={() => setScannerOpen(true)}>
+            <ScanLine className="mr-2 h-4 w-4" /> Scan QR
+          </Button>
           <div className="ml-auto text-sm text-muted-foreground">
             Total alat bulan ini:{" "}
             <span className="font-semibold text-foreground">{monthSchedule.length}</span>
