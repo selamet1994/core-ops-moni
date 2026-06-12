@@ -1,7 +1,7 @@
 // AUTO-GENERATED from PREVENTIVE_MEP/HVAC/PANEL_MHKN_Master.xlsx
 export type PMScheduleItem = { group: 'MEP'|'HVAC'|'PANEL'; month: string; code: string; name: string; location: string; periode: string };
 
-export const PM_SCHEDULE = ([
+const _DATA = [
 {
 "group": "MEP",
 "month": "Januari",
