@@ -339,23 +339,35 @@ function PMCatalogView({
                       <TableHead>Nama Alat</TableHead>
                       <TableHead>Lokasi</TableHead>
                       <TableHead className="w-40">Periode</TableHead>
-                      <TableHead className="w-32 text-right">Aksi</TableHead>
+                      <TableHead className="w-20 text-center">Cek</TableHead>
+                      <TableHead className="w-44 text-right">Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {list.map((it, i) => (
-                      <TableRow key={`${g}-${i}-${it.code}`}>
-                        <TableCell className="font-mono text-xs">{it.code}</TableCell>
-                        <TableCell className="font-medium">{it.name}</TableCell>
-                        <TableCell className="text-sm text-muted-foreground">{it.location || "—"}</TableCell>
-                        <TableCell className="text-xs">{it.periode || "—"}</TableCell>
-                        <TableCell className="text-right">
-                          <Button size="sm" variant="outline" onClick={() => onScheduleItem(it)}>
-                            <Plus className="mr-1 h-3.5 w-3.5" /> Tiket
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {list.map((it, i) => {
+                      const checkCount = checklistForItem(it).length;
+                      return (
+                        <TableRow key={`${g}-${i}-${it.code}`}>
+                          <TableCell className="font-mono text-xs">{it.code}</TableCell>
+                          <TableCell className="font-medium">{it.name}</TableCell>
+                          <TableCell className="text-sm text-muted-foreground">{it.location || "—"}</TableCell>
+                          <TableCell className="text-xs">{it.periode || "—"}</TableCell>
+                          <TableCell className="text-center">
+                            <Badge variant="secondary" className="text-[10px]">{checkCount} item</Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-1.5">
+                              <Button size="sm" variant="outline" onClick={() => setDetailItem(it)}>
+                                <Eye className="mr-1 h-3.5 w-3.5" /> Detail
+                              </Button>
+                              <Button size="sm" variant="outline" onClick={() => onScheduleItem(it)}>
+                                <Plus className="mr-1 h-3.5 w-3.5" /> Tiket
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </div>
