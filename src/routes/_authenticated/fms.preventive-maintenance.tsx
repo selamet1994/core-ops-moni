@@ -415,6 +415,18 @@ function PMCatalogView({
           </Accordion>
         </CardContent>
       </Card>
+
+      <QRScannerDialog
+        open={scannerOpen}
+        onOpenChange={setScannerOpen}
+        onDetected={(text) => setScheduleSearch(text)}
+      />
+      <PMItemDetailDialog
+        open={!!detailItem}
+        onOpenChange={(v) => { if (!v) setDetailItem(null); }}
+        item={detailItem}
+        onCreateTicket={(it) => onScheduleItem(it)}
+      />
     </div>
   );
 }
