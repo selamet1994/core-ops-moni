@@ -213,13 +213,38 @@ function PMPage() {
   );
 }
 
-function PMCatalogView({ onSchedule }: { onSchedule: (cat: PMCategory) => void }) {
+function PMCatalogView({
+  onSchedule,
+  onScheduleItem,
+}: {
+  onSchedule: (cat: PMCategory) => void;
+  onScheduleItem: (it: PMScheduleItem) => void;
+}) {
   const [group, setGroup] = useState<string>("ALL");
   const [month, setMonth] = useState<string>(MONTHS_ID[new Date().getMonth()]);
+  const [scheduleSearch, setScheduleSearch] = useState("");
+
   const items = useMemo(
-    () => group === "ALL" ? PM_CATALOG : PM_CATALOG.filter((c) => c.group === group),
+    () => (group === "ALL" ? PM_CATALOG : PM_CATALOG.filter((c) => c.group === group)),
     [group],
   );
+
+  const monthSchedule = useMemo(() => {
+    const q = scheduleSearch.trim().toLowerCase();
+    return PM_SCHEDULE.filter((s) => s.month === month)
+      .filter((s) => (group === "ALL" || group === "LIFT" ? true : s.group === group))
+      .filter((s) =>
+        q
+          ? [s.code, s.name, s.location, s.periode].some((v) => v.toLowerCase().includes(q))
+          : true,
+      );
+  }, [month, group, scheduleSearch]);
+
+  const grouped = useMemo(() => {
+    const m: Record<string, PMScheduleItem[]> = {};
+    for (const it of monthSchedule) (m[it.group] ||= []).push(it);
+    return m;
+  }, [monthSchedule]);
 
   return (
     <div className="space-y-4">
@@ -227,7 +252,8 @@ function PMCatalogView({ onSchedule }: { onSchedule: (cat: PMCategory) => void }
         <CardHeader className="pb-3">
           <CardTitle className="text-base">Daftar PM yang harus dilakukan tiap bulan</CardTitle>
           <CardDescription>
-            Referensi master MHKN — pilih bulan & kelompok, lalu generate tiket PM untuk kategori yang dikerjakan.
+            Sumber: <span className="font-medium">PREVENTIVE MEP / HVAC / PANEL MHKN — Master</span>.
+            Pilih bulan & kelompok untuk melihat daftar alat beserta lokasinya.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap items-end gap-3">
@@ -247,17 +273,87 @@ function PMCatalogView({ onSchedule }: { onSchedule: (cat: PMCategory) => void }
                 <SelectItem value="MEP">MEP</SelectItem>
                 <SelectItem value="HVAC">HVAC</SelectItem>
                 <SelectItem value="PANEL">Panel</SelectItem>
-                <SelectItem value="LIFT">Lift</SelectItem>
+                <SelectItem value="LIFT">Lift (checklist)</SelectItem>
               </SelectContent>
             </Select>
           </div>
+          <div className="space-y-1 flex-1 min-w-[200px]">
+            <Label className="text-xs">Cari alat / lokasi</Label>
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                className="pl-8"
+                placeholder="Mis. Chiller, AHU, PP HVAC, LANTAI 3…"
+                value={scheduleSearch}
+                onChange={(e) => setScheduleSearch(e.target.value)}
+              />
+            </div>
+          </div>
           <div className="ml-auto text-sm text-muted-foreground">
-            Total: <span className="font-semibold text-foreground">{items.length}</span> kategori
+            Total alat bulan ini:{" "}
+            <span className="font-semibold text-foreground">{monthSchedule.length}</span>
           </div>
         </CardContent>
       </Card>
 
       <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <CalendarDays className="h-4 w-4" /> Jadwal Alat — {month}
+          </CardTitle>
+          <CardDescription>
+            Daftar alat & lokasi yang harus di-PM pada bulan {month} (dari master Excel).
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-0">
+          {Object.keys(grouped).length === 0 ? (
+            <div className="py-8 text-center text-sm text-muted-foreground">
+              Tidak ada alat terjadwal untuk filter ini.
+            </div>
+          ) : (
+            Object.entries(grouped).map(([g, list]) => (
+              <div key={g} className="border-t first:border-t-0">
+                <div className="flex items-center gap-2 bg-muted/40 px-4 py-2 text-xs font-semibold">
+                  <Badge variant="outline" className="font-mono text-[10px]">{g}</Badge>
+                  <span>{list.length} alat</span>
+                </div>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-40">Kode</TableHead>
+                      <TableHead>Nama Alat</TableHead>
+                      <TableHead>Lokasi</TableHead>
+                      <TableHead className="w-40">Periode</TableHead>
+                      <TableHead className="w-32 text-right">Aksi</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {list.map((it, i) => (
+                      <TableRow key={`${g}-${i}-${it.code}`}>
+                        <TableCell className="font-mono text-xs">{it.code}</TableCell>
+                        <TableCell className="font-medium">{it.name}</TableCell>
+                        <TableCell className="text-sm text-muted-foreground">{it.location || "—"}</TableCell>
+                        <TableCell className="text-xs">{it.periode || "—"}</TableCell>
+                        <TableCell className="text-right">
+                          <Button size="sm" variant="outline" onClick={() => onScheduleItem(it)}>
+                            <Plus className="mr-1 h-3.5 w-3.5" /> Tiket
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            ))
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">Referensi Checklist PM (per kategori)</CardTitle>
+          <CardDescription>Item pemeriksaan standar untuk tiap kategori alat.</CardDescription>
+        </CardHeader>
         <CardContent className="p-2 sm:p-4">
           <Accordion type="multiple" className="w-full">
             {items.map((cat) => (
