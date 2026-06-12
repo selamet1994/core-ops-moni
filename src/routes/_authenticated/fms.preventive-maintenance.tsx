@@ -33,6 +33,7 @@ function PMPage() {
   const { user, isAdmin } = useAuth();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [scannerOpen, setScannerOpen] = useState(false);
 
   const { data = [], isLoading } = useQuery({
     queryKey: ["pm"],
