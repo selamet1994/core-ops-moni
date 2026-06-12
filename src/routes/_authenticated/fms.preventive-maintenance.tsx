@@ -233,6 +233,8 @@ function PMCatalogView({
   const [group, setGroup] = useState<string>("ALL");
   const [month, setMonth] = useState<string>(MONTHS_ID[new Date().getMonth()]);
   const [scheduleSearch, setScheduleSearch] = useState("");
+  const [scannerOpen, setScannerOpen] = useState(false);
+  const [detailItem, setDetailItem] = useState<PMScheduleItem | null>(null);
 
   const items = useMemo(
     () => (group === "ALL" ? PM_CATALOG : PM_CATALOG.filter((c) => c.group === group)),
