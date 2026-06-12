@@ -17,9 +17,11 @@ import { PageHeader } from "@/components/PageHeader";
 import { StatusBadge } from "@/components/StatusBadge";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
-import { Plus, Search, Trash2, Loader2, ClipboardList, CheckCircle2, CalendarDays } from "lucide-react";
+import { Plus, Search, Trash2, Loader2, ClipboardList, CheckCircle2, CalendarDays, QrCode, ScanLine, Eye } from "lucide-react";
 import { PM_CATALOG, MONTHS_ID, type PMCategory } from "@/lib/pm-catalog";
 import { PM_SCHEDULE, type PMScheduleItem } from "@/lib/pm-schedule";
+import { QRScannerDialog } from "@/components/QRScannerDialog";
+import { PMItemDetailDialog, checklistForItem } from "@/components/PMItemDetailDialog";
 
 export const Route = createFileRoute("/_authenticated/fms/preventive-maintenance")({
   head: () => ({ meta: [{ title: "Preventive Maintenance — FMS" }] }),
