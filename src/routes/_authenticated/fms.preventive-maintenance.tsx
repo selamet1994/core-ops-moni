@@ -188,19 +188,14 @@ function PMPage() {
             }}
             onScheduleItem={(it) => {
               const today = new Date().toISOString().slice(0, 10);
-              const cat = PM_CATALOG.find(
-                (c) =>
-                  c.group === it.group &&
-                  (it.name.toUpperCase().includes(c.name.toUpperCase().split(" ")[0]) ||
-                    c.name.toUpperCase().includes(it.name.toUpperCase().split(" ")[0])),
-              );
+              const checklist = checklistForItem(it);
               const notes = [
                 `Kode: ${it.code}`,
                 `Periode: ${it.periode}`,
                 `Bulan: ${it.month}`,
                 "",
-                ...(cat
-                  ? ["Checklist PM:", ...cat.checklist.map((c, i) => `${i + 1}. ${c}`)]
+                ...(checklist.length
+                  ? ["Checklist PM:", ...checklist.map((c, i) => `${i + 1}. ${c}`)]
                   : []),
               ].join("\n");
               createMut.mutate({
@@ -215,6 +210,15 @@ function PMPage() {
           />
         </TabsContent>
       </Tabs>
+
+      <QRScannerDialog
+        open={scannerOpen}
+        onOpenChange={setScannerOpen}
+        onDetected={(text) => {
+          setSearch(text);
+          toast.success(`QR terdeteksi: ${text}`);
+        }}
+      />
     </>
   );
 }
