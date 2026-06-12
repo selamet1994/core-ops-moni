@@ -12050,4 +12050,5 @@ const _DATA = [
 "location": "LT.10 / RUMAH LIFT PESSENGER",
 "periode": "Periode 2 Bulan"
 }
-] as const).map(x => x as PMScheduleItem);
+];
+export const PM_SCHEDULE: PMScheduleItem[] = _DATA as PMScheduleItem[];
