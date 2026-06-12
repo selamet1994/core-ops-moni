@@ -17,9 +17,11 @@ import { PageHeader } from "@/components/PageHeader";
 import { StatusBadge } from "@/components/StatusBadge";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
-import { Plus, Search, Trash2, Loader2, ClipboardList, CheckCircle2, CalendarDays } from "lucide-react";
+import { Plus, Search, Trash2, Loader2, ClipboardList, CheckCircle2, CalendarDays, ScanLine, Eye } from "lucide-react";
 import { PM_CATALOG, MONTHS_ID, type PMCategory } from "@/lib/pm-catalog";
 import { PM_SCHEDULE, type PMScheduleItem } from "@/lib/pm-schedule";
+import { QRScannerDialog } from "@/components/QRScannerDialog";
+import { PMItemDetailDialog, checklistForItem } from "@/components/PMItemDetailDialog";
 
 export const Route = createFileRoute("/_authenticated/fms/preventive-maintenance")({
   head: () => ({ meta: [{ title: "Preventive Maintenance — FMS" }] }),
@@ -31,6 +33,7 @@ function PMPage() {
   const { user, isAdmin } = useAuth();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [scannerOpen, setScannerOpen] = useState(false);
 
   const { data = [], isLoading } = useQuery({
     queryKey: ["pm"],
@@ -102,8 +105,11 @@ function PMPage() {
           <div className="flex flex-wrap items-center gap-2">
             <div className="relative">
               <Search className="pointer-events-none absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input placeholder="Cari aset / tiket…" className="w-64 pl-8" value={search} onChange={(e) => setSearch(e.target.value)} />
+              <Input placeholder="Cari aset / tiket / kode QR…" className="w-72 pl-8" value={search} onChange={(e) => setSearch(e.target.value)} />
             </div>
+            <Button variant="outline" onClick={() => setScannerOpen(true)}>
+              <ScanLine className="mr-2 h-4 w-4" /> Scan QR
+            </Button>
             <div className="ml-auto">
               <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
@@ -182,19 +188,14 @@ function PMPage() {
             }}
             onScheduleItem={(it) => {
               const today = new Date().toISOString().slice(0, 10);
-              const cat = PM_CATALOG.find(
-                (c) =>
-                  c.group === it.group &&
-                  (it.name.toUpperCase().includes(c.name.toUpperCase().split(" ")[0]) ||
-                    c.name.toUpperCase().includes(it.name.toUpperCase().split(" ")[0])),
-              );
+              const checklist = checklistForItem(it);
               const notes = [
                 `Kode: ${it.code}`,
                 `Periode: ${it.periode}`,
                 `Bulan: ${it.month}`,
                 "",
-                ...(cat
-                  ? ["Checklist PM:", ...cat.checklist.map((c, i) => `${i + 1}. ${c}`)]
+                ...(checklist.length
+                  ? ["Checklist PM:", ...checklist.map((c, i) => `${i + 1}. ${c}`)]
                   : []),
               ].join("\n");
               createMut.mutate({
@@ -209,6 +210,15 @@ function PMPage() {
           />
         </TabsContent>
       </Tabs>
+
+      <QRScannerDialog
+        open={scannerOpen}
+        onOpenChange={setScannerOpen}
+        onDetected={(text) => {
+          setSearch(text);
+          toast.success(`QR terdeteksi: ${text}`);
+        }}
+      />
     </>
   );
 }
@@ -223,6 +233,8 @@ function PMCatalogView({
   const [group, setGroup] = useState<string>("ALL");
   const [month, setMonth] = useState<string>(MONTHS_ID[new Date().getMonth()]);
   const [scheduleSearch, setScheduleSearch] = useState("");
+  const [scannerOpen, setScannerOpen] = useState(false);
+  const [detailItem, setDetailItem] = useState<PMScheduleItem | null>(null);
 
   const items = useMemo(
     () => (group === "ALL" ? PM_CATALOG : PM_CATALOG.filter((c) => c.group === group)),
@@ -278,17 +290,20 @@ function PMCatalogView({
             </Select>
           </div>
           <div className="space-y-1 flex-1 min-w-[200px]">
-            <Label className="text-xs">Cari alat / lokasi</Label>
+            <Label className="text-xs">Cari alat / lokasi / kode QR</Label>
             <div className="relative">
               <Search className="pointer-events-none absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 className="pl-8"
-                placeholder="Mis. Chiller, AHU, PP HVAC, LANTAI 3…"
+                placeholder="Mis. Chiller, AHU, PP HVAC, LANTAI 3, MEP-MHKN-001…"
                 value={scheduleSearch}
                 onChange={(e) => setScheduleSearch(e.target.value)}
               />
             </div>
           </div>
+          <Button variant="outline" onClick={() => setScannerOpen(true)}>
+            <ScanLine className="mr-2 h-4 w-4" /> Scan QR
+          </Button>
           <div className="ml-auto text-sm text-muted-foreground">
             Total alat bulan ini:{" "}
             <span className="font-semibold text-foreground">{monthSchedule.length}</span>
@@ -324,23 +339,35 @@ function PMCatalogView({
                       <TableHead>Nama Alat</TableHead>
                       <TableHead>Lokasi</TableHead>
                       <TableHead className="w-40">Periode</TableHead>
-                      <TableHead className="w-32 text-right">Aksi</TableHead>
+                      <TableHead className="w-20 text-center">Cek</TableHead>
+                      <TableHead className="w-44 text-right">Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {list.map((it, i) => (
-                      <TableRow key={`${g}-${i}-${it.code}`}>
-                        <TableCell className="font-mono text-xs">{it.code}</TableCell>
-                        <TableCell className="font-medium">{it.name}</TableCell>
-                        <TableCell className="text-sm text-muted-foreground">{it.location || "—"}</TableCell>
-                        <TableCell className="text-xs">{it.periode || "—"}</TableCell>
-                        <TableCell className="text-right">
-                          <Button size="sm" variant="outline" onClick={() => onScheduleItem(it)}>
-                            <Plus className="mr-1 h-3.5 w-3.5" /> Tiket
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {list.map((it, i) => {
+                      const checkCount = checklistForItem(it).length;
+                      return (
+                        <TableRow key={`${g}-${i}-${it.code}`}>
+                          <TableCell className="font-mono text-xs">{it.code}</TableCell>
+                          <TableCell className="font-medium">{it.name}</TableCell>
+                          <TableCell className="text-sm text-muted-foreground">{it.location || "—"}</TableCell>
+                          <TableCell className="text-xs">{it.periode || "—"}</TableCell>
+                          <TableCell className="text-center">
+                            <Badge variant="secondary" className="text-[10px]">{checkCount} item</Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-1.5">
+                              <Button size="sm" variant="outline" onClick={() => setDetailItem(it)}>
+                                <Eye className="mr-1 h-3.5 w-3.5" /> Detail
+                              </Button>
+                              <Button size="sm" variant="outline" onClick={() => onScheduleItem(it)}>
+                                <Plus className="mr-1 h-3.5 w-3.5" /> Tiket
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </div>
@@ -388,6 +415,18 @@ function PMCatalogView({
           </Accordion>
         </CardContent>
       </Card>
+
+      <QRScannerDialog
+        open={scannerOpen}
+        onOpenChange={setScannerOpen}
+        onDetected={(text) => setScheduleSearch(text)}
+      />
+      <PMItemDetailDialog
+        open={!!detailItem}
+        onOpenChange={(v) => { if (!v) setDetailItem(null); }}
+        item={detailItem}
+        onCreateTicket={(it) => onScheduleItem(it)}
+      />
     </div>
   );
 }
