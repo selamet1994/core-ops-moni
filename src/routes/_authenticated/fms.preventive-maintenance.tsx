@@ -168,17 +168,45 @@ function PMPage() {
         </TabsContent>
 
         <TabsContent value="catalog">
-          <PMCatalogView onSchedule={(cat) => {
-            const today = new Date().toISOString().slice(0, 10);
-            createMut.mutate({
-              asset_name: cat.name,
-              location: "",
-              description: `PM Bulanan ${cat.name} — ${cat.checklist.length} item pemeriksaan`,
-              scheduled_date: today,
-              priority: "medium",
-              notes: cat.checklist.map((c, i) => `${i + 1}. ${c}`).join("\n"),
-            });
-          }} />
+          <PMCatalogView
+            onSchedule={(cat) => {
+              const today = new Date().toISOString().slice(0, 10);
+              createMut.mutate({
+                asset_name: cat.name,
+                location: "",
+                description: `PM Bulanan ${cat.name} — ${cat.checklist.length} item pemeriksaan`,
+                scheduled_date: today,
+                priority: "medium",
+                notes: cat.checklist.map((c, i) => `${i + 1}. ${c}`).join("\n"),
+              });
+            }}
+            onScheduleItem={(it) => {
+              const today = new Date().toISOString().slice(0, 10);
+              const cat = PM_CATALOG.find(
+                (c) =>
+                  c.group === it.group &&
+                  (it.name.toUpperCase().includes(c.name.toUpperCase().split(" ")[0]) ||
+                    c.name.toUpperCase().includes(it.name.toUpperCase().split(" ")[0])),
+              );
+              const notes = [
+                `Kode: ${it.code}`,
+                `Periode: ${it.periode}`,
+                `Bulan: ${it.month}`,
+                "",
+                ...(cat
+                  ? ["Checklist PM:", ...cat.checklist.map((c, i) => `${i + 1}. ${c}`)]
+                  : []),
+              ].join("\n");
+              createMut.mutate({
+                asset_name: `${it.name} (${it.code})`,
+                location: it.location,
+                description: `PM ${it.group} — ${it.name} di ${it.location}`,
+                scheduled_date: today,
+                priority: "medium",
+                notes,
+              });
+            }}
+          />
         </TabsContent>
       </Tabs>
     </>
