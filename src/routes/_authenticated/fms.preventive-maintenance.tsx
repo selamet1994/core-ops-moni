@@ -35,6 +35,7 @@ function PMPage() {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [scannerOpen, setScannerOpen] = useState(false);
+  const [viewRow, setViewRow] = useState<any>(null);
 
   const { data = [], isLoading } = useQuery({
     queryKey: ["pm"],
