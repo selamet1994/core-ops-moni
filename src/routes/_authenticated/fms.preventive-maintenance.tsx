@@ -17,11 +17,12 @@ import { PageHeader } from "@/components/PageHeader";
 import { StatusBadge } from "@/components/StatusBadge";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
-import { Plus, Search, Trash2, Loader2, ClipboardList, CheckCircle2, CalendarDays, ScanLine, Eye } from "lucide-react";
+import { Plus, Search, Trash2, Loader2, ClipboardList, CheckCircle2, CalendarDays, ScanLine, Eye, Download } from "lucide-react";
 import { PM_CATALOG, MONTHS_ID, type PMCategory } from "@/lib/pm-catalog";
 import { PM_SCHEDULE, type PMScheduleItem } from "@/lib/pm-schedule";
 import { QRScannerDialog } from "@/components/QRScannerDialog";
 import { PMItemDetailDialog, checklistForItem } from "@/components/PMItemDetailDialog";
+import { PMResultDialog } from "@/components/PMResultDialog";
 
 export const Route = createFileRoute("/_authenticated/fms/preventive-maintenance")({
   head: () => ({ meta: [{ title: "Preventive Maintenance — FMS" }] }),
@@ -34,6 +35,7 @@ function PMPage() {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [scannerOpen, setScannerOpen] = useState(false);
+  const [viewRow, setViewRow] = useState<any>(null);
 
   const { data = [], isLoading } = useQuery({
     queryKey: ["pm"],
@@ -110,6 +112,9 @@ function PMPage() {
             <Button variant="outline" onClick={() => setScannerOpen(true)}>
               <ScanLine className="mr-2 h-4 w-4" /> Scan QR
             </Button>
+            <Button variant="outline" onClick={() => exportAllCSV(filtered)}>
+              <Download className="mr-2 h-4 w-4" /> Export CSV
+            </Button>
             <div className="ml-auto">
               <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
@@ -159,6 +164,9 @@ function PMPage() {
                         </Select>
                       </TableCell>
                       <TableCell className="text-right">
+                        <Button variant="ghost" size="icon" onClick={() => setViewRow(r)} title="Lihat hasil PM">
+                          <Eye className="h-4 w-4" />
+                        </Button>
                         {isAdmin && (
                           <Button variant="ghost" size="icon" onClick={() => { if (confirm("Hapus data ini?")) delMut.mutate(r.id); }}>
                             <Trash2 className="h-4 w-4 text-destructive" />
@@ -219,8 +227,24 @@ function PMPage() {
           toast.success(`QR terdeteksi: ${text}`);
         }}
       />
+
+      <PMResultDialog open={!!viewRow} onOpenChange={(v) => !v && setViewRow(null)} row={viewRow} />
     </>
   );
+}
+
+function exportAllCSV(rows: any[]) {
+  const header = ["Ticket", "Aset", "Lokasi", "Jadwal", "Selesai", "Status", "Prioritas", "Penandatangan", "Catatan"];
+  const lines = [header, ...rows.map((r) => [
+    r.ticket_no, r.asset_name, r.location ?? "", r.scheduled_date, r.completed_date ?? "",
+    r.status, r.priority, r.signer_name ?? "", (r.notes ?? "").replace(/\n/g, " | "),
+  ])];
+  const csv = lines.map((r) => r.map((c) => `"${String(c ?? "").replace(/"/g, '""')}"`).join(",")).join("\n");
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `pm-export-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
 }
 
 function PMCatalogView({
