@@ -9,7 +9,7 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 export default defineConfig({
   vite: {
     // Jalur dasar (Base URL) disesuaikan dengan nama repositori GitHub Anda
-    base: '/NAMA_REPOSITORI_ANDA/', 
+    base: '/core-ops-moni/', 
   },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
