@@ -123,6 +123,7 @@ export type Database = {
         Row: {
           asset_name: string
           assigned_to: string | null
+          checklist_results: Json | null
           completed_date: string | null
           created_at: string
           created_by: string
@@ -130,8 +131,11 @@ export type Database = {
           id: string
           location: string | null
           notes: string | null
+          photo_urls: Json
           priority: string
           scheduled_date: string
+          signature_url: string | null
+          signer_name: string | null
           status: Database["public"]["Enums"]["work_status"]
           ticket_no: string
           updated_at: string
@@ -139,6 +143,7 @@ export type Database = {
         Insert: {
           asset_name: string
           assigned_to?: string | null
+          checklist_results?: Json | null
           completed_date?: string | null
           created_at?: string
           created_by: string
@@ -146,8 +151,11 @@ export type Database = {
           id?: string
           location?: string | null
           notes?: string | null
+          photo_urls?: Json
           priority?: string
           scheduled_date: string
+          signature_url?: string | null
+          signer_name?: string | null
           status?: Database["public"]["Enums"]["work_status"]
           ticket_no?: string
           updated_at?: string
@@ -155,6 +163,7 @@ export type Database = {
         Update: {
           asset_name?: string
           assigned_to?: string | null
+          checklist_results?: Json | null
           completed_date?: string | null
           created_at?: string
           created_by?: string
@@ -162,8 +171,11 @@ export type Database = {
           id?: string
           location?: string | null
           notes?: string | null
+          photo_urls?: Json
           priority?: string
           scheduled_date?: string
+          signature_url?: string | null
+          signer_name?: string | null
           status?: Database["public"]["Enums"]["work_status"]
           ticket_no?: string
           updated_at?: string
