@@ -27,6 +27,19 @@ jobs:
       - name: Build Project
         run: bun run build
 
+      - name: Fix For GitHub Pages 404
+        run: |
+          # Cek jika Lovable membuat folder .output (ciri khas TanStack Start/Nitro)
+          if [ -d ".output/public" ]; then
+            cp -r .output/public dist
+          elif [ -d ".netlify/images" ] || [ ! -f "dist/index.html" ]; then
+            # Jika index.html tersembunyi di folder lain, kita paksa buat cadangan
+            mkdir -p dist
+            cp .output/public/index.html dist/index.html 2>/dev/null || true
+          fi
+          # Membuat file 404.html tiruan agar routing React tidak patah saat di-refresh
+          cp dist/index.html dist/404.html 2>/dev/null || true
+
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
