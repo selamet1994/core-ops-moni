@@ -8,12 +8,16 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
   vite: {
-    // Jalur dasar (Base URL) disesuaikan dengan nama repositori GitHub Anda
-    base: '/core-ops-moni/', 
+    // Menyesuaikan dengan nama repositori GitHub Anda
+    base: '/core-ops-moni/',
+    build: {
+      // Memaksa output folder statis bernama 'dist'
+      outDir: 'dist',
+    }
   },
   tanstackStart: {
-    // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
-    // nitro/vite builds from this
+    // Mematikan SSR (Server-Side Rendering) agar dikompilasi sebagai aplikasi statis biasa (SPA) yang ramah GitHub Pages
+    ssr: false,
     server: { entry: "server" },
   },
 });
