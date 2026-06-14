@@ -164,6 +164,9 @@ function PMPage() {
                         </Select>
                       </TableCell>
                       <TableCell className="text-right">
+                        <Button variant="ghost" size="icon" onClick={() => setViewRow(r)} title="Lihat hasil PM">
+                          <Eye className="h-4 w-4" />
+                        </Button>
                         {isAdmin && (
                           <Button variant="ghost" size="icon" onClick={() => { if (confirm("Hapus data ini?")) delMut.mutate(r.id); }}>
                             <Trash2 className="h-4 w-4 text-destructive" />
