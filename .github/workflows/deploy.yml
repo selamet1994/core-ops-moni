@@ -1,11 +1,9 @@
-
-```yaml
 name: Deploy to GitHub Pages
 
 on:
   push:
     branches:
-      - main  # atau ganti master jika nama branch utama Anda 'master'
+      - main
 
 permissions:
   contents: write
@@ -18,13 +16,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install and Build
-        run: |
-          npm install
-          npm run build
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install Dependencies
+        run: bun install
+
+      - name: Build Project
+        run: bun run build
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: dist # Folder hasil build dari Lovable/Vite
-          branch: gh-pages # Branch khusus tempat menaruh web jadi
+          folder: dist
+          branch: gh-pages
