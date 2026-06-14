@@ -1,4 +1,3 @@
-3. Di dalam kotak isi file di bawahnya, tempelkan (*paste*) kode konfigurasi standar Vite berikut ini:
 
 ```yaml
 name: Deploy to GitHub Pages
