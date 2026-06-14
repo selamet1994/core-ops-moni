@@ -227,8 +227,24 @@ function PMPage() {
           toast.success(`QR terdeteksi: ${text}`);
         }}
       />
+
+      <PMResultDialog open={!!viewRow} onOpenChange={(v) => !v && setViewRow(null)} row={viewRow} />
     </>
   );
+}
+
+function exportAllCSV(rows: any[]) {
+  const header = ["Ticket", "Aset", "Lokasi", "Jadwal", "Selesai", "Status", "Prioritas", "Penandatangan", "Catatan"];
+  const lines = [header, ...rows.map((r) => [
+    r.ticket_no, r.asset_name, r.location ?? "", r.scheduled_date, r.completed_date ?? "",
+    r.status, r.priority, r.signer_name ?? "", (r.notes ?? "").replace(/\n/g, " | "),
+  ])];
+  const csv = lines.map((r) => r.map((c) => `"${String(c ?? "").replace(/"/g, '""')}"`).join(",")).join("\n");
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `pm-export-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
 }
 
 function PMCatalogView({
